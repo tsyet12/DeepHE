@@ -221,16 +221,11 @@ def HE_solve(T_hot,T_cold,Num_HE):
     return inf
   print(sum([Cph[i].value*(Th_i0[0][i].value-Thf[i].value) for i in range(Nh)]))
   print(sum([Cpc[i].value*(Tcf[i].value-Tc_j0[0][i].value) for i in range(Nc)]))
-  import pprint
-  pp = pprint.PrettyPrinter(indent=4)
   print("Number of hot stream = ",Nh)
   print("Number of cold stream = ", Nc)
   print("Hot Stream Temperature=", trackhot)
   print("Cold Stream Temperature=", trackcold)
-
-  import pprint
   print("Heat Recovered:",Qm)
-
   print("Hot binary:")
   print(wh)
   print("Cold binary:")
@@ -242,17 +237,34 @@ def HE_solve(T_hot,T_cold,Num_HE):
   print("Cold Temperature out:",Tcout)
   print("Heater Temperature:",Theater_cin,Theater_cout)
   
+  seqH=[None]*Nhe
+  seqC=[None]*Nhe
+  
+  for j in range(Nhe):
+    for i in range(Nh):
+      if wh[i][j].value==[1.0] or wh[i][j].value==1.0:
+        seqH[j]=i+1
+  print(seqH)
+  
+  for j in range(Nhe):
+    for i in range(Nc):
+      if wc[i][j].value==[1.0] or wc[i][j].value==1.0:
+        seqC[j]=i+1
+  print(seqC)
+  
   with open('data/train.csv', 'a', newline='') as fd:
     writer=csv.writer(fd)
-    writer.writerow([str(T_hot),str(T_cold),str(wh),str(wc),str(Qm),str(m.options.objfcnval)])
+    writer.writerow([str(T_hot+T_cold),str(seqH),str(seqC),str(Qm),str(m.options.objfcnval)])
   return m.options.objfcnval
 
 
 objective_list=[]
-for i in range(3):
+for i in range(46):
   
-  Nh=random.randint(low=1,high=4)
-  Nc=random.randint(low=1,high=4)
+  #Nh=random.randint(low=1,high=4)
+  #Nc=random.randint(low=1,high=4)
+  Nh=3
+  Nc=3
   Hot_list=[]
   Cold_list=[]
   
@@ -262,7 +274,7 @@ for i in range(3):
   for k in range(Nc):
     Cold_list.append(random.uniform(low=25,high=60))
     
-  answer=HE_solve(Hot_list,Cold_list,4)
+  answer=HE_solve(Hot_list,Cold_list,5)
   objective_list.append(answer)
 print(objective_list)
   
